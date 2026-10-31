@@ -13,6 +13,7 @@ build_exe/dist/
 # 二进制的安装包不进仓库
 *.exe
 *.apk
+*.ipa
 *.idsig
 
 # 系统垃圾
