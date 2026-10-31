@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+# 这些文件必须是 LF，否则在 macOS/linux 上跑会报 \r 错误
+*.sh      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.swift   text eol=lf
+*.py      text eol=lf
+
+*.png     binary
+*.ico     binary
+*.keystore binary
+*.jar     binary
