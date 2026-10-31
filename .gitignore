@@ -1,18 +1,13 @@
-# 本地工具链（JDK + Android SDK，约 750 MB，不要提交）
-tools/
-
 # 构建中间产物
 ios/build/
 ios/Payload/
 ios/*.ipa
 ios/NEVPriceCalc.xcodeproj/
-android/build/
 build_exe/build/
 build_exe/dist/
 
 # 二进制的安装包不进仓库
 *.exe
-*.apk
 *.ipa
 *.idsig
 
