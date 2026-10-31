@@ -2,6 +2,7 @@
 # 构建 iOS 未签名 IPA（供自签工具使用）
 # 用法：./build.sh            —— macOS 上直接跑
 #       CI 里也是跑这一个脚本，保证本地与云端产物一致
+# 依赖：xcodegen（CI 里由 brew 安装；本机先 brew install xcodegen）
 set -euo pipefail
 
 cd "$(dirname "$0")"

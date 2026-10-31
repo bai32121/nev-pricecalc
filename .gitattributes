@@ -7,6 +7,9 @@
 *.swift   text eol=lf
 *.py      text eol=lf
 
+# 批处理反过来必须是 CRLF，否则 cmd 会把整行拆坏
+*.bat     text eol=crlf
+
 *.png     binary
 *.ico     binary
 *.keystore binary
