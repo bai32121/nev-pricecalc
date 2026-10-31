@@ -104,6 +104,10 @@
   .chip:hover span{border-color:#bfc4ce}
   .chip em{font-style:normal;font-size:11px;color:var(--faint);margin-left:4px;font-weight:400}
   .chip input:checked+span em,.chip.is-on span em{color:var(--accent);opacity:.8}
+  /* 5 年返息方案锁定期限时，其余期限置灰不可选 */
+  .chip.is-lock{opacity:.38;cursor:not-allowed}
+  .chip.is-lock span{cursor:not-allowed;background:#f7f8fa}
+  .chip.is-lock:hover span{border-color:var(--line-strong)}
   .lab-tip{font-size:11px;color:var(--faint);font-weight:400;margin-left:5px}
 
   /* 选配逐行输入 */
@@ -448,7 +452,7 @@
             <div class="chips">
               <label class="chip"><input type="radio" name="repay" value="equal" checked><span>等额本息</span></label>
               <label class="chip"><input type="radio" name="repay" value="principal"><span>等额本金</span></label>
-              <label class="chip"><input type="radio" name="repay" value="rebate"><span>3 年返息<em>前 2 年 0 息</em></span></label>
+              <label class="chip"><input type="radio" name="repay" value="rebate"><span>5 年返息<em>前 2 年 0 息</em></span></label>
             </div>
           </div>
           <div class="field full" id="fieldRateN">
@@ -456,11 +460,11 @@
             <div class="iw has-unit"><input id="rate" type="number" step="0.01" min="0" max="40" value="2.99"><u>%</u></div>
           </div>
           <div class="field full hide" id="fieldRate3">
-            <label>第 3 年利率</label>
+            <label>第 3–5 年利率</label>
             <div class="iw has-unit"><input id="rate3" type="number" step="0.01" min="0" max="40" value="3.99"><u>%</u></div>
           </div>
           <div class="field full hide" id="rebateNote">
-            <div class="sub-note">前 24 期只还本金、0 息（利息由厂商贴息或首年返还）；第 25 期起剩余本金按上表利率摊还。若期限短于 24 期，则全程 0 息。</div>
+            <div class="sub-note">5 年期贷款：前 24 期只还本金、0 息（利息由厂商贴息或首年返还）；第 25–60 期剩余本金按「第 3–5 年利率」摊还。选此方案时贷款期限自动锁定为 60 期。</div>
           </div>
           <div class="field">
             <label>金融服务费</label>
@@ -635,7 +639,7 @@
     <b>购置税：</b>新能源乘用车在 2026.1.1–2027.12.31 期间<b>减半征收</b>，实征 5%（计税价格 = 裸车价 ÷ 1.13），每辆<b>减税上限 1.5 万元</b>，车价超过约 33.9 万后超出部分按 10% 正常缴纳。列入目录的新能源车同时免征车船税。<br>
     <b>置换补贴（安徽 2026）：</b>换购新能源乘用车按新车销售价格（发票价税合计）的 <b>8%</b> 补贴，<b>上限 1.5 万元</b>；报废更新为 12%、上限 2 万元。两者只能选一种，政策期内每位消费者限享一次，补贴在审核后返还，提车时仍需先全额垫付。因此结果区给出两个口径：<b>实付落地价</b>（提车时按票面全额支付）与<b>补贴到账后净支出</b>（最终真正花掉的钱），差额即为补贴。<br>
     <b>原厂选配：</b>与整车开在同一张发票上的选装配置（智驾包、座椅包、轮毂、车漆等）计入发票价，因此<b>同步抬升购置税、贷款基数与置换补贴基数</b>。后市场的装饰 / 加装、充电桩安装单列在落地费用里，不计购置税。<br>
-    <b>返息方案（3 年返息，前 2 年 0 息）：</b>前 24 期只还本金、不计利息，第 25 期起剩余本金按「第 3 年利率」摊还；若期限不足 24 期则全程 0 息。贴息一般由厂商或经销商承担，常见形式为利息先付后返、或直接冲抵车价，需以合同条款为准。真实年化按整段现金流算，因此会低于第 3 年名义利率——这正是贴息带来的收益。<br>
+    <b>返息方案（5 年返息，前 2 年 0 息）：</b>5 年期贷款（60 期），前 24 期只还本金、不计利息，第 25–60 期剩余本金按「第 3–5 年利率」摊还。贴息一般由厂商或经销商承担，常见形式为利息先付后返、或直接冲抵车价，需以合同条款为准。真实年化按整段现金流算，因此会低于第 3–5 年名义利率——这正是贴息带来的收益。<br>
     <b>真实年化利率：</b>按现金流 IRR 计算，期初实际到手 = 贷款额 − 金融服务费 − 强制装潢，逐期月供折现求月内部收益率再 ×12 折算（APR 口径），可直接与银行报的名义利率对比。续保押金可退，不计入成本。<br>
     <b>换电车型（BaaS）：</b>电池不计入购置税计税价格，先按「车电分离」后的裸车价填写即可。<br>
     商业险、上牌费各地差异较大，可自行覆盖默认值。5 年用车成本中第 1 年保险已含在落地价内，不重复计入。结果仅供参考，以经销商报价与贷款合同为准。
@@ -677,7 +681,7 @@ function computeCore(i){
       for (var t = 0; t < n; t++) pays.push(monthly);
       firstPay = lastPay = monthly;
     } else if (i.repay === 'rebate') {
-      // 3 年返息：前 2 年（最多 24 期）0 息只还本，其余期数按低息摊还剩余本金
+      // 5 年期返息：前 2 年（24 期）只还本金、0 息，第 3–5 年（36 期）按低息摊还剩余本金
       freeN = Math.min(24, n);
       var restN = n - freeN;
       var prinR = loan / n;
@@ -879,7 +883,26 @@ function computeCore(i){
     };
   }
 
+  // 5 年返息与 60 期绑定：这个金融产品本身就是 5 年期，
+  // 放开期限会出现「前 24 期 0 息 + 只剩 12 期付息」的错配，所以锁死。
+  function syncTermLock(){
+    var isRebate = radio('repay') === 'rebate';
+    var list = document.querySelectorAll('input[name="term"]');
+    for (var k = 0; k < list.length; k++) {
+      var inp = list[k];
+      var lock = isRebate && inp.value !== '60';
+      inp.disabled = lock;
+      var chip = inp.parentNode;
+      if (chip && chip.classList) chip.classList.toggle('is-lock', lock);
+    }
+    if (isRebate) {
+      var t60 = document.querySelector('input[name="term"][value="60"]');
+      if (t60 && !t60.checked) t60.checked = true;
+    }
+  }
+
   function render(){
+    syncTermLock();   // 必须在 read() 之前，否则本次仍按旧期限算
     var i = read();
     var r = computeCore(i);
     last = r;
@@ -972,7 +995,7 @@ function computeCore(i){
     }
     $('subsidyNote').textContent = sNote;
 
-    // 返息方案：切换显示第 3 年利率
+    // 返息方案：切换显示第 3–5 年利率
     var isRebate = i.repay === 'rebate';
     $('fieldRate3').classList.toggle('hide', !isRebate);
     $('fieldRateN').classList.toggle('hide', isRebate);
@@ -1051,10 +1074,10 @@ function computeCore(i){
     if (r.loan > 0) {
       var bench = isRebate ? (i.rate3 || 0) / 100 : i.rate / 100;
       if (r.irrAnnual - bench > 0.008) {
-        notes.push((isRebate ? '第 3 年名义利率 ' + i.rate3.toFixed(2) + '%' : '名义利率 ' + i.rate.toFixed(2) + '%')
+        notes.push((isRebate ? '第 3–5 年名义利率 ' + i.rate3.toFixed(2) + '%' : '名义利率 ' + i.rate.toFixed(2) + '%')
           + ' 只是账面数字，把金融服务费摊进现金流后，你实际承担的年化成本是 <b>' + pc(r.irrAnnual) + '</b>。');
       } else if (bench - r.irrAnnual > 0.008) {
-        notes.push({t: '贴息方案：前 2 年 0 息把整体年化拉到 <b>' + pc(r.irrAnnual) + '</b>，比第 3 年名义利率 ' + i.rate3.toFixed(2) + '% 还低 ' + ((bench - r.irrAnnual)*100).toFixed(2) + ' 个百分点。', c: 'neutral'});
+        notes.push({t: '贴息方案：前 2 年 0 息把整体年化拉到 <b>' + pc(r.irrAnnual) + '</b>，比第 3–5 年名义利率 ' + i.rate3.toFixed(2) + '% 还低 ' + ((bench - r.irrAnnual)*100).toFixed(2) + ' 个百分点。', c: 'neutral'});
       }
     }
     if (r.ratio > 0 && r.ratio > 0.35) {
@@ -1209,7 +1232,7 @@ function computeCore(i){
       grid += cell('5 年总支出', money(p.total5));
       grid += cell('每公里', '¥' + p.perKm.toFixed(2));
       grid += cell('还款方式',
-                   p.repay === 'rebate' ? '3 年返息'
+                   p.repay === 'rebate' ? '5 年返息'
                  : p.repay === 'principal' ? '等额本金'
                  : p.repay === 'equal' ? '等额本息' : '—');
       grid += cell('首付比例', p.downPct != null ? Math.round(p.downPct*100) + '%' : '—');
