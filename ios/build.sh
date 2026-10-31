@@ -25,6 +25,18 @@ fi
 echo "· 生成 Xcode 工程"
 xcodegen generate --quiet
 
+# ---- 2.5 兜底层：确保工程格式老到任何 Xcode 都愿意打开 ----
+# project.yml 里已指定 projectFormat: xcode14_0，但 XcodeGen 的默认值会随
+# 版本漂移（2.44 的默认已经是 xcode16_0 = objectVersion 77）。这里再拦一道：
+# 只要发现 objectVersion 是 7x，就压回 56，免得又撞上
+# "The project could not be opened because it is in a future Xcode project file format"
+PBX="${APP_NAME}.xcodeproj/project.pbxproj"
+if [ -f "$PBX" ] && grep -q 'objectVersion = 7' "$PBX"; then
+  echo "· 工程格式偏新，降级到 Xcode 14 (objectVersion 56)"
+  /usr/bin/sed -i '' -E 's/objectVersion = [0-9]+;/objectVersion = 56;/' "$PBX"
+  /usr/bin/sed -i '' -E 's/compatibilityVersion = "[^"]*";/compatibilityVersion = "Xcode 14.0";/' "$PBX"
+fi
+
 # ---- 3. 无签名构建 ----
 echo "· 编译（CODE_SIGNING_ALLOWED=NO）"
 xcodebuild \

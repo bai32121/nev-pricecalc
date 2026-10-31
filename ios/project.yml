@@ -4,6 +4,11 @@ options:
   bundleIdPrefix: com.nev
   createIntermediateGroups: true
   minimumXcodeGenVersion: "2.25.0"
+  # 工程文件格式钉在 Xcode 14（objectVersion 56）。
+  # XcodeGen 新版默认 xcode16_0（objectVersion 77），
+  # 而 CI 的 macos-14 跑的是 Xcode 15，读到 77 会直接报
+  # "future Xcode project file format" 拒绝打开。
+  projectFormat: xcode14_0
   deploymentTarget:
     iOS: "13.0"
 
