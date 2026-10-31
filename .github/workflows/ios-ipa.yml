@@ -1,0 +1,35 @@
+name: Build unsigned IPA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "ios/**"
+      - "车价计算器.html"
+      - ".github/workflows/ios-ipa.yml"
+
+jobs:
+  ipa:
+    name: iOS 未签名 IPA
+    runs-on: macos-14
+    timeout-minutes: 40
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 xcodegen
+        run: brew install xcodegen
+
+      - name: 构建
+        run: |
+          chmod +x ios/build.sh
+          cd ios
+          ./build.sh
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEVPriceCalc-unsigned-ipa
+          path: ios/build/NEVPriceCalc-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,58 @@
+name: NEVPriceCalc
+
+options:
+  bundleIdPrefix: com.nev
+  createIntermediateGroups: true
+  minimumXcodeGenVersion: "2.25.0"
+  deploymentTarget:
+    iOS: "13.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+
+targets:
+  NEVPriceCalc:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources
+    settings:
+      base:
+        PRODUCT_NAME: NEVPriceCalc
+        PRODUCT_BUNDLE_IDENTIFIER: com.nev.pricecalc
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "13.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # 未签名构建靠命令行参数，这里保持默认，方便你在 Xcode 里选自己的 Team 真机调试
+        CLANG_ENABLE_MODULES: "YES"
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: 车价计算器
+        CFBundleName: NEVPriceCalc
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        CFBundleDevelopmentRegion: zh_CN
+        LSRequiresIPhoneOS: true
+        UILaunchStoryboardName: LaunchScreen
+        UIUserInterfaceStyle: Light
+        UIViewControllerBasedStatusBarAppearance: true
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        ITSAppUsesNonExemptEncryption: false
+
+schemes:
+  NEVPriceCalc:
+    build:
+      targets:
+        NEVPriceCalc: all
+    run:
+      config: Release
+    archive:
+      config: Release
