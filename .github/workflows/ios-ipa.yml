@@ -11,7 +11,10 @@ on:
 jobs:
   ipa:
     name: iOS 未签名 IPA
-    runs-on: macos-14
+    # 不要用 macos-14：该镜像已进入退役周期，job 会分配不到机器并被秒取消
+    # （表现是 run 创建后 1 秒变 cancelled，runner_name 为空、没有任何 step 执行）。
+    # macos-15 自带 Xcode 16，能读 objectVersion 56/77 两种工程格式。
+    runs-on: macos-15
     timeout-minutes: 40
     permissions:
       contents: write   # 创建 Release 需要
