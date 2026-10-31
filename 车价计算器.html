@@ -177,6 +177,36 @@
   .note+.note{margin-top:7px}
   .note.neutral{background:#f6f7f9;color:var(--muted);border-color:var(--line)}
 
+  /* ---------- 方案切换标签（全款 / 贷款 分板块） ---------- */
+  .segs{
+    display:flex;gap:4px;padding:4px;border-radius:13px;flex-shrink:0;
+    background:#eceff4;border:1px solid #e2e6ed;
+    box-shadow:inset 0 1px 2px rgba(16,24,40,.05)
+  }
+  .seg{
+    flex:1 1 0;min-width:0;padding:7px 8px 6px;border:none;border-radius:10px;
+    background:transparent;color:var(--muted);text-align:center;font-weight:500;
+    display:flex;flex-direction:column;align-items:center;gap:1px;
+    transition:background .18s ease,box-shadow .18s ease,color .18s ease
+  }
+  .seg:hover{background:rgba(255,255,255,.6);border-color:transparent}
+  .seg.on{
+    background:#fff;color:var(--text);
+    box-shadow:0 1px 3px rgba(16,24,40,.11),0 0 0 1px rgba(16,24,40,.045)
+  }
+  .seg-lb{font-size:12.5px;font-weight:600;letter-spacing:-.1px;line-height:1.3;white-space:nowrap}
+  .seg.on .seg-lb{font-weight:700}
+  .seg-v{
+    font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;line-height:1.35;
+    max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  }
+  .seg.on[data-seg="cash"] .seg-v{color:#4a5464}
+  .seg.on[data-seg="loan"] .seg-v{color:#2f6bd8}
+  .seg.is-dim .seg-v{opacity:.45}
+  .tab-in{animation:tabIn .22s cubic-bezier(.4,0,.2,1)}
+  @keyframes tabIn{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.tab-in{animation:none}}
+
   /* ---------- 方案模块：全款 / 贷款 两块独立展示 ---------- */
   .mod{position:relative;padding-top:17px;overflow:hidden}
   .mod::before{content:'';position:absolute;left:0;right:0;top:0;height:3px}
@@ -507,6 +537,18 @@
 
     <!-- ================= 结果区 ================= -->
     <aside class="col-right">
+      <!-- ============ 方案切换：两个板块各占一屏 ============ -->
+      <div class="segs" id="segs" role="tablist" aria-label="全款 / 贷款 方案切换">
+        <button type="button" class="seg on" data-seg="cash" role="tab" aria-selected="true" aria-controls="modCash">
+          <span class="seg-lb">全款方案</span>
+          <span class="seg-v" id="segCashV">¥0</span>
+        </button>
+        <button type="button" class="seg" data-seg="loan" role="tab" aria-selected="false" aria-controls="modLoan">
+          <span class="seg-lb">贷款方案</span>
+          <span class="seg-v" id="segLoanV">¥0</span>
+        </button>
+      </div>
+
       <!-- ============ 模块 A：全款方案 ============ -->
       <div class="card mod mod-cash" id="modCash" style="margin-bottom:0">
         <div class="mod-h">
@@ -537,7 +579,7 @@
       </div>
 
       <!-- ============ 模块 B：贷款方案 ============ -->
-      <div class="card mod mod-loan" id="modLoan" style="margin-bottom:0">
+      <div class="card mod mod-loan hide" id="modLoan" style="margin-bottom:0">
         <div class="mod-h">
           <span class="mod-tag">B</span>
           <h3>贷款方案</h3>
@@ -890,6 +932,7 @@ function computeCore(i){
     // 落地价：实付 / 净支出 分列
     var hasSub = i.subsidy > 0;
     $('rPay').textContent = money(r.payLand);
+    $('segCashV').textContent = money(r.payLand);   // 标签上同步全款落地价
     $('rPayLb').textContent = hasSub ? '全款落地价（实付）' : '全款落地价';
     $('rPaySub').textContent = hasSub ? '提车时按票面全额支付' : wan(r.payLand);
     $('lsNet').classList.toggle('hide', !hasSub);
@@ -978,6 +1021,17 @@ function computeCore(i){
     }
     // 两段月供文字较长时自动缩字号，避免撑破小卡片
     $('rMonthly').classList.toggle('sm', $('rMonthly').textContent.length > 11);
+
+    // 标签上同步贷款摘要：月供 / 「—」（首付 100% 时）
+    var segLoan = $('segs').querySelector('.seg[data-seg="loan"]');
+    if (r.loan <= 0) {
+      $('segLoanV').textContent = '本次无贷款';
+    } else if (i.repay === 'principal') {
+      $('segLoanV').textContent = money(r.firstPay) + ' 起/月';
+    } else {
+      $('segLoanV').textContent = money(r.monthly) + '/月';
+    }
+    if (segLoan) segLoan.classList.toggle('is-dim', r.loan <= 0);
     $('rLoanAmt').textContent = money(r.loan);
     $('rInterest').textContent = money(r.totalInterest);
     $('rTotalRepay').textContent = money(r.totalRepay);
@@ -1321,8 +1375,60 @@ function computeCore(i){
     tt = setTimeout(function(){ el.classList.remove('on'); }, 1800);
   }
 
+  // ================= 方案板块切换（全款 / 贷款 各占一屏） =================
+  var TAB_KEY = 'nev_tab_v1';
+  var curTab = 'cash';
+
+  function applyTab(name, animate){
+    curTab = (name === 'loan') ? 'loan' : 'cash';
+    var isCash = (curTab === 'cash');
+    var show = isCash ? $('modCash') : $('modLoan');
+    var gone = isCash ? $('modLoan') : $('modCash');
+
+    gone.classList.add('hide');
+    gone.classList.remove('tab-in');
+    show.classList.remove('hide');
+    if (animate) {
+      show.classList.remove('tab-in');
+      void show.offsetWidth;   // 强制重排，让动画能重播
+      show.classList.add('tab-in');
+    }
+
+    var segs = $('segs').querySelectorAll('.seg');
+    for (var k = 0; k < segs.length; k++) {
+      var on = segs[k].getAttribute('data-seg') === curTab;
+      segs[k].classList.toggle('on', on);
+      segs[k].setAttribute('aria-selected', on ? 'true' : 'false');
+      segs[k].setAttribute('tabindex', on ? '0' : '-1');
+    }
+  }
+
+  function pickTab(name){
+    if (name === curTab) return;
+    applyTab(name, true);
+    try { localStorage.setItem(TAB_KEY, curTab); } catch (err) {}
+  }
+
+  $('segs').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.seg') : null;
+    if (!b) return;
+    pickTab(b.getAttribute('data-seg'));
+  });
+
+  $('segs').addEventListener('keydown', function(e){
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    var next = (curTab === 'cash') ? 'loan' : 'cash';
+    pickTab(next);
+    var b = $('segs').querySelector('.seg[data-seg="' + next + '"]');
+    if (b) b.focus();
+    e.preventDefault();
+  });
+
   addOptRow();          // 默认给一行空行，直接能填
   syncEnergy();
+  var savedTab = 'cash';
+  try { savedTab = localStorage.getItem(TAB_KEY) || 'cash'; } catch (err) {}
+  applyTab(savedTab, false);
   render();
   renderPlans();
 })();
