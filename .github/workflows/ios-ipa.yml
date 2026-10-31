@@ -13,6 +13,8 @@ jobs:
     name: iOS 未签名 IPA
     runs-on: macos-14
     timeout-minutes: 40
+    permissions:
+      contents: write   # 创建 Release 需要
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -26,10 +28,21 @@ jobs:
           cd ios
           ./build.sh
 
-      - name: 上传产物
+      - name: 上传产物（需登录才能下载）
         uses: actions/upload-artifact@v4
         with:
           name: NEVPriceCalc-unsigned-ipa
           path: ios/build/NEVPriceCalc-unsigned.ipa
           if-no-files-found: error
           retention-days: 30
+
+      # 手机上直接点链接就能下，TrollStore 会接手安装；
+      # Artifact 那条路要登录 + 解压，在手机上很难受
+      - name: 发布到 Release（手机可直接下载）
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete ios-latest --yes --cleanup-tag || true
+          gh release create ios-latest ios/build/NEVPriceCalc-unsigned.ipa \
+            --title "iOS 未签名 IPA（TrollStore 直接装）" \
+            --notes "未签名包，TrollStore 里打开即可永久安装。适用于 iOS 14.0–17.0。"
