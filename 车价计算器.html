@@ -33,8 +33,8 @@
   /* 方案切换控件上移到页头，与标题同排 */
   .hero .segs{width:352px;max-width:100%;flex-shrink:0}
   @media (max-width:700px){.hero .segs{width:100%}}
-  /* 重置 / 保存为方案下移到页尾，紧接方案对比 */
-  .page-actions{display:flex;justify-content:flex-end;gap:8px;margin:16px 0 2px}
+  /* 重置 / 保存为方案放在方案对比上方 */
+  .page-actions{display:flex;justify-content:flex-end;gap:8px;margin:0 0 12px}
   @media (max-width:560px){
     .page-actions{gap:8px}
     .page-actions button{flex:1 1 0}
@@ -627,6 +627,11 @@
     </aside>
   </div>
 
+  <div data-page-node-id="sdAAaQ2ZoEW3wQXCpLGFr4" class="page-actions">
+    <button data-page-node-id="k8t9MYQ97LE814u1Tn4PLI" id="btnReset"><!--pnid:XXSBJVjbe2SfDUOL05Gm7G-->重置</button>
+    <button data-page-node-id="ELNJpYX1FxbzfQjfpiuWOB" class="primary" id="btnSave"><!--pnid:7xHxE0lgnuxBIo326qE3Ch-->保存为方案</button>
+  </div>
+
   <!--pnid:T5aRDVgd0cfXoIAQzSXgxY--><!-- ================= 对比 ================= -->
   <section data-page-node-id="8ExR13iVgBmt5o5uTqZ6MT" class="card compare">
     <div data-page-node-id="N73vg7NrU1PEQScoKs9PMf" class="card-h">
@@ -638,11 +643,6 @@
     </div>
     <div data-page-node-id="p3PrnIQ7WALLXW4uq2GuoD" class="plans" id="plansBox"></div>
   </section>
-
-  <div data-page-node-id="sdAAaQ2ZoEW3wQXCpLGFr4" class="page-actions">
-    <button data-page-node-id="k8t9MYQ97LE814u1Tn4PLI" id="btnReset"><!--pnid:XXSBJVjbe2SfDUOL05Gm7G-->重置</button>
-    <button data-page-node-id="ELNJpYX1FxbzfQjfpiuWOB" class="primary" id="btnSave"><!--pnid:7xHxE0lgnuxBIo326qE3Ch-->保存为方案</button>
-  </div>
 
   <div data-page-node-id="AcbZlKHgewFKHJ4aZV5vYk" class="foot">
     <b data-page-node-id="gWLbfsVPIeUJm31yqBgfBt"><!--pnid:S7U2IBOEKCRGk9Fwx1NUV2-->购置税：</b><!--pnid:erG68NM5z4DHhOuYdaIVKu-->新能源乘用车在 2026.1.1–2027.12.31 期间<b data-page-node-id="CYGZr9vFgVwgI5MX7loSUI"><!--pnid:tRXyD6mmG4ZgWyK02zknmK-->减半征收</b><!--pnid:AqXzRvJcG0wtb7jnjr1Px0-->，实征 5%（计税价格 = 裸车价 ÷ 1.13），每辆<b data-page-node-id="MjYZcAtK9yGvVRnGXoqbft"><!--pnid:OcPOdWc17UQL40CQUASkJk-->减税上限 1.5 万元</b><!--pnid:CoI1LFfjhUqCEFpRedkZXH-->，车价超过约 33.9 万后超出部分按 10% 正常缴纳。列入目录的新能源车同时免征车船税。<br data-page-node-id="Y7CNDZS1WXbdMGYnDMLuNZ">
@@ -1213,7 +1213,7 @@ function computeCore(i){
     var plans = loadPlans();
     var box = $('plansBox');
     if (!plans.length) {
-      box.innerHTML = '<div class="empty">还没有保存的方案。调好参数后点页面底部「保存为方案」，可以对比不同车型 / 首付 / 期限。</div>';
+      box.innerHTML = '<div class="empty">还没有保存的方案。调好参数后点上方「保存为方案」，可以对比不同车型 / 首付 / 期限。</div>';
       syncFoldBtn();
       return;
     }
