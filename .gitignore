@@ -11,6 +11,9 @@ build_exe/dist/
 *.ipa
 *.idsig
 
+# 线上发布目录里的页面是 车价计算器.html 的副本，发布前现拷，不单独纳入版本管理
+web/index.html
+
 # 系统垃圾
 .DS_Store
 Thumbs.db
