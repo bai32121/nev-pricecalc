@@ -145,6 +145,13 @@
   .box{background:#f8fafd;border:1px solid #eef2f8;border-radius:11px;padding:10px 12px}
   .box .k{font-size:10.5px;color:#8b98ab;letter-spacing:.3px}
   .box .v{font-size:15.5px;font-weight:700;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums}
+  .box .k em{font-style:normal;font-size:9.5px;color:#a7b3c4;margin-left:4px}
+  .box-edit{background:#f3f7ff;border-color:#dbe6fb}
+  .box-edit .v{margin-top:1px}
+  .box-edit input{width:118px;max-width:100%;border:0;background:transparent;font:inherit;font-weight:700;color:var(--blue);
+    font-variant-numeric:tabular-nums;padding:1px 2px;border-bottom:1px dashed #c3d4f2;text-align:left;
+    border-radius:2px 2px 0 0;transition:.15s}
+  .box-edit input:focus{outline:0;border-bottom-color:var(--blue);background:rgba(255,255,255,.7)}
 
   /* 5 年总账 */
   .y5{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -242,15 +249,16 @@
     <aside class="panel">
       <div class="prow">
         <div class="fld">
-          <label>购车城市</label>
-          <div class="selwrap"><select class="sel" id="city">
-            <option>深圳</option><option>成都</option><option>杭州</option><option>广州</option><option>合肥</option><option>北京</option><option>其他城市</option>
+          <label>补贴政策</label>
+          <div class="selwrap"><select class="sel" id="policy">
+            <option value="first">首购政策</option>
+            <option value="tradein">置换补贴政策</option>
+            <option value="scrap">报废补贴政策</option>
           </select></div>
         </div>
         <div class="fld">
           <label>购车方式</label>
           <div class="seg3" id="modeSeg">
-            <button data-mode="trade">置换</button>
             <button data-mode="loan">按揭</button>
             <button data-mode="cash" class="on">全款</button>
           </div>
@@ -258,8 +266,8 @@
       </div>
 
       <div class="policy">
-        <h4 id="policyTitle">深圳 · 首购政策</h4>
-        <p id="policyText">未自动计入地方补贴与经销商店头优惠，如需请手动填写「置换补贴」。</p>
+        <h4 id="policyTitle">首购政策</h4>
+        <p id="policyText">无置换 / 报废补贴。新能源乘用车 2026 年购置税减半已自动计入。</p>
       </div>
 
       <div class="fld">
@@ -269,17 +277,19 @@
 
       <div class="lines">
         <div class="ln"><span class="k">官方指导价</span><span class="v" id="lGuide">¥159,900</span></div>
-        <div class="ln"><span class="k">官方优惠<em>限时权益</em></span>
+        <div class="ln"><span class="k">厂家优惠<em>官方权益</em></span>
           <span class="v wrapin neg"><input id="iDisc" type="text" value="−¥4,000" inputmode="numeric" autocomplete="off"></span></div>
+        <div class="ln"><span class="k">店铺优惠<em>店头让利</em></span>
+          <span class="v wrapin neg"><input id="iShop" type="text" value="−¥0" inputmode="numeric" autocomplete="off"></span></div>
         <div class="ln net"><span class="k">裸车价<em>开票价</em></span><span class="v" id="lNet">¥155,900</span></div>
         <div class="ln"><span class="k">购置税<em>2026 减半</em></span><span class="v plus" id="lTax">+¥6,898</span></div>
         <div class="ln"><span class="k">保险费</span>
           <span class="v wrapin"><input id="iIns" type="text" value="¥5,000" inputmode="numeric" autocomplete="off"></span></div>
         <div class="ln"><span class="k">上牌 / 服务费</span>
           <span class="v wrapin"><input id="iFee" type="text" value="¥500" inputmode="numeric" autocomplete="off"></span></div>
-        <div class="ln" id="rowSubsidy" style="display:none"><span class="k">置换补贴<em>地方政策</em></span>
+        <div class="ln" id="rowSubsidy" style="display:none"><span class="k" id="subsidyLabel">置换补贴<em>地方政策</em></span>
           <span class="v wrapin neg"><input id="iSubsidy" type="text" value="−¥0" inputmode="numeric" autocomplete="off"></span></div>
-        <div class="ln" id="rowTrade" style="display:none"><span class="k">旧车折价</span>
+        <div class="ln" id="rowTrade" style="display:none"><span class="k" id="tradeLabel">旧车折价</span>
           <span class="v wrapin neg"><input id="iTrade" type="text" value="−¥0" inputmode="numeric" autocomplete="off"></span></div>
       </div>
 
@@ -299,7 +309,7 @@
     <div class="loan-grid">
       <div class="lc">
         <label>首付比例</label>
-        <div class="range"><input type="range" id="iDown" min="10" max="100" step="5" value="30"><output id="oDown">30%</output></div>
+        <div class="range"><input type="range" id="iDown" min="0" max="100" step="1" value="30"><output id="oDown">30%</output></div>
       </div>
       <div class="lc">
         <label>贷款期限</label>
@@ -324,7 +334,8 @@
       </div>
     </div>
     <div class="loan-lines">
-      <div class="box"><div class="k">首付</div><div class="v" id="bDown">¥0</div></div>
+      <div class="box box-edit"><div class="k">首付<em>可直接改金额</em></div>
+        <div class="v"><input id="iDownAmt" type="text" value="¥46,770" inputmode="numeric" autocomplete="off"></div></div>
       <div class="box"><div class="k">贷款金额</div><div class="v" id="bLoan">¥0</div></div>
       <div class="box"><div class="k">总利息</div><div class="v" id="bInt">¥0</div></div>
       <div class="box"><div class="k">真实年化 IRR</div><div class="v" id="bIrr">0%</div></div>
@@ -385,10 +396,23 @@
   var CURATED = TRIMS[2].id;
 
   var state = {
-    trim: CURATED, city: '深圳', mode: 'cash',
-    disc: 4000, ins: 5000, fee: 500, subsidy: 0, trade: 0,
-    downPct: 30, term: 60, repay: 'rebate', rate: 3.5,
+    trim: CURATED, policy: 'first', mode: 'cash',
+    disc: 4000, shop: 0, ins: 5000, fee: 500, subsidy: 0, trade: 0,
+    downPct: 30, downManual: false, downAmt: 0,
+    term: 60, repay: 'rebate', rate: 3.5,
     mileage: 15000, energyPrice: 0.6, maintain: 800, insYear: 4200, residualPct: 45
+  };
+
+  // 补贴政策：决定显示哪一行补贴、哪一行旧车，以及切换时带出的参考金额
+  var POLICIES = {
+    first: { label:'首购政策', subsidyLabel:'', tradeLabel:'', defSubsidy:0, defTrade:0,
+      text:'无置换 / 报废补贴。新能源乘用车 2026 年购置税减半已自动计入。' },
+    tradein: { label:'置换补贴政策', subsidyLabel:'置换补贴<em>地方政策</em>', tradeLabel:'旧车折价',
+      defSubsidy:8000, defTrade:0,
+      text:'按当地以旧换新政策填写补贴金额，此处预填 8,000 为参考值，请按实际修改；旧车折价按评估价填写。' },
+    scrap: { label:'报废补贴政策', subsidyLabel:'报废补贴<em>地方政策</em>', tradeLabel:'报废残值',
+      defSubsidy:20000, defTrade:0,
+      text:'报废更新补贴此处预填 20,000 为参考值，请按当年政策与实际到账金额修改；报废残值按回收报价填写。' }
   };
   var KEY_STATE = 'nev.q06.state.v1';
   var KEY_PLANS = 'nev.q06.plans.v1';
@@ -396,18 +420,21 @@
   // ---------- 计算 ----------
   function calc(){
     var t = TRIMS.filter(function(x){ return x.id === state.trim; })[0] || TRIMS[2];
-    var net = Math.max(0, t.guide - state.disc);
+    var pol = POLICIES[state.policy] || POLICIES.first;
+    var net = Math.max(0, t.guide - state.disc - state.shop);
     var full = (net / 1.13) * 0.10;
     var relief = Math.min(full * 0.5, 15000);
     var tax = Math.max(0, full - relief);
 
-    var subsidy = state.mode === 'trade' ? Math.max(0, state.subsidy) : 0;
-    var tradeIn = state.mode === 'trade' ? Math.max(0, state.trade) : 0;
+    var subsidy = pol.subsidyLabel ? Math.max(0, state.subsidy) : 0;
+    var tradeIn = pol.tradeLabel ? Math.max(0, state.trade) : 0;
 
     var payLand = net + tax + state.ins + state.fee;      // 票面落地
     var land = payLand - subsidy - tradeIn;               // 净支出
 
-    var down = net * state.downPct / 100;
+    var down = state.downManual
+      ? Math.min(Math.max(0, state.downAmt || 0), net)
+      : net * state.downPct / 100;
     var loan = state.mode === 'loan' ? Math.max(0, net - down) : 0;
     var n = state.term, r = state.rate / 100 / 12;
 
@@ -509,22 +536,27 @@
     $('totalInt').textContent = fmt(intPart);
     $('totalDec').textContent = '.' + String(decPart).padStart(2, '0');
     $('totalK').innerHTML = (state.mode === 'loan' ? '落地价<em>（不含贷款利息）</em>' : '最终价格<em>（预计到手）</em>');
+    var pol = POLICIES[state.policy] || POLICIES.first;
     var note = '裸车价 + 购置税 + 保险 + 上牌';
-    if (c.subsidy > 0) note += ' − 置换补贴 ' + money(c.subsidy);
-    if (c.tradeIn > 0) note += ' − 旧车折价 ' + money(c.tradeIn);
+    if (c.subsidy > 0) note += ' − ' + pol.subsidyLabel.split('<')[0] + ' ' + money(c.subsidy);
+    if (c.tradeIn > 0) note += ' − ' + pol.tradeLabel + ' ' + money(c.tradeIn);
     $('totalNote').textContent = note;
 
-    // 置换行
-    $('rowSubsidy').style.display = state.mode === 'trade' ? 'flex' : 'none';
-    $('rowTrade').style.display = state.mode === 'trade' ? 'flex' : 'none';
+    // 补贴 / 旧车行（由政策决定）
+    $('rowSubsidy').style.display = pol.subsidyLabel ? 'flex' : 'none';
+    $('rowTrade').style.display = pol.tradeLabel ? 'flex' : 'none';
+    $('subsidyLabel').innerHTML = pol.subsidyLabel;
+    $('tradeLabel').textContent = pol.tradeLabel;
 
     // 贷款
     $('loanCard').style.display = state.mode === 'loan' ? '' : 'none';
     if (state.mode === 'loan') {
-      $('oDown').textContent = state.downPct + '%';
+      var pctNow = c.net > 0 ? c.down / c.net * 100 : 0;
+      $('oDown').textContent = (state.downManual ? pctNow.toFixed(1) : state.downPct) + '%';
+      $('iDown').value = state.downManual ? Math.round(pctNow) : state.downPct;
       $('oRate').textContent = state.rate.toFixed(1) + '%';
       $('rateLabel').textContent = state.repay === 'rebate' ? '第 3–5 年利率' : '年化利率';
-      $('bDown').textContent = money(c.down);
+      if (document.activeElement !== $('iDownAmt')) $('iDownAmt').value = '\u00A5' + fmt(Math.round(c.down));
       $('bLoan').textContent = money(c.loan);
       $('bInt').textContent = money(c.totalInterest);
       $('bIrr').textContent = c.loan > 0 ? pct(c.irr) : '—';
@@ -561,10 +593,8 @@
     }).join('');
 
     // 政策条
-    $('policyTitle').textContent = state.city + ' · ' + (state.mode === 'trade' ? '置换政策' : '首购政策');
-    $('policyText').textContent = state.mode === 'trade'
-      ? '置换补贴按当地政策人工填写；新能源乘用车 2026 年购置税减半，已按上限 1.5 万自动封顶。'
-      : '未自动计入地方补贴与经销商店头优惠，如需请手动填写「置换补贴」。';
+    $('policyTitle').textContent = pol.label;
+    $('policyText').textContent = pol.text;
 
     saveState();
   }
@@ -577,14 +607,16 @@
   }
 
   function syncInputs(){
-    $('city').value = state.city;
+    $('policy').value = state.policy;
     $('trim').value = state.trim;
     $('iDisc').value = amtText('iDisc', state.disc);
+    $('iShop').value = amtText('iShop', state.shop);
     $('iIns').value = amtText('iIns', state.ins);
     $('iFee').value = amtText('iFee', state.fee);
     $('iSubsidy').value = amtText('iSubsidy', state.subsidy);
     $('iTrade').value = amtText('iTrade', state.trade);
     $('iDown').value = state.downPct;
+    $('iDownAmt').value = '\u00A5' + fmt(Math.round(calc().down));
     $('iTerm').value = state.term;
     $('iRepay').value = state.repay;
     $('iRate').value = state.rate;
@@ -597,7 +629,14 @@
     var b = e.target.closest('button'); if (!b) return;
     state.mode = b.dataset.mode; syncInputs(); render();
   });
-  $('city').addEventListener('change', function(){ state.city = this.value; render(); });
+  $('policy').addEventListener('change', function(){
+    state.policy = this.value;
+    var p = POLICIES[state.policy] || POLICIES.first;
+    state.subsidy = p.defSubsidy;
+    state.trade = p.defTrade;
+    syncInputs(); render();
+    toast(p.defSubsidy ? p.label + '：已预填补贴 ' + fmt(p.defSubsidy) + ' 元，可按实际改' : '已切换为' + p.label + '，无补贴项');
+  });
   $('trim').addEventListener('change', function(){ state.trim = this.value; render(); });
   function parseAmt(v){ var n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isNaN(n) ? 0 : Math.max(0, n); }
   function amtText(id, val){ return ($(id).closest('.wrapin').classList.contains('neg') ? '−\u00A5' : '\u00A5') + fmt(val); }
@@ -607,9 +646,21 @@
     el.addEventListener('focus', function(){ this.value = state[key] ? String(state[key]) : '0'; try { this.select(); } catch(e){} });
     el.addEventListener('blur', function(){ this.value = amtText(id, state[key]); });
   }
-  bindAmt('iDisc','disc'); bindAmt('iIns','ins'); bindAmt('iFee','fee');
+  bindAmt('iDisc','disc'); bindAmt('iShop','shop'); bindAmt('iIns','ins'); bindAmt('iFee','fee');
   bindAmt('iSubsidy','subsidy'); bindAmt('iTrade','trade');
-  $('iDown').addEventListener('input', function(){ state.downPct = +this.value; render(); });
+
+  // 首付：滑杆与金额输入双向联动
+  function downNow(){ return Math.round(calc().down); }
+  $('iDownAmt').addEventListener('input', function(){
+    state.downManual = true; state.downAmt = parseAmt(this.value); render();
+  });
+  $('iDownAmt').addEventListener('focus', function(){
+    this.value = String(downNow()); try { this.select(); } catch(e){}
+  });
+  $('iDownAmt').addEventListener('blur', function(){ this.value = '\u00A5' + fmt(downNow()); });
+  $('iDown').addEventListener('input', function(){
+    state.downPct = +this.value; state.downManual = false; state.downAmt = 0; render();
+  });
   $('iTerm').addEventListener('change', function(){ state.term = +this.value; render(); });
   $('iRepay').addEventListener('change', function(){ state.repay = this.value; render(); });
   $('iRate').addEventListener('input', function(){ state.rate = +this.value; render(); });
@@ -622,19 +673,21 @@
 
   $('btnCopy').addEventListener('click', function(){
     var c = calc();
-    var modeText = state.mode === 'loan' ? '按揭' : (state.mode === 'trade' ? '置换' : '首购');
+    var pol = POLICIES[state.policy] || POLICIES.first;
+    var modeText = state.mode === 'loan' ? '按揭' : '全款';
     var lines = [
       '【长安启源 Q06 报价】',
-      c.t.name + ' · ' + state.city + ' · ' + modeText,
+      c.t.name + ' · ' + pol.label + ' · ' + modeText,
       '官方指导价：' + money(c.t.guide),
-      '官方优惠：-' + money(state.disc),
+      '厂家优惠：-' + money(state.disc),
+      '店铺优惠：-' + money(state.shop),
       '裸车价：' + money(c.net),
       '购置税：' + money(c.tax),
       '保险：' + money(state.ins),
       '上牌服务：' + money(state.fee)
     ];
-    if (c.subsidy > 0) lines.push('置换补贴：-' + money(c.subsidy));
-    if (c.tradeIn > 0) lines.push('旧车折价：-' + money(c.tradeIn));
+    if (c.subsidy > 0) lines.push(pol.subsidyLabel.split('<')[0] + '：-' + money(c.subsidy));
+    if (c.tradeIn > 0) lines.push(pol.tradeLabel + '：-' + money(c.tradeIn));
     lines.push((state.mode === 'loan' ? '落地价（不含息）：' : '最终价格：') + money2(c.land));
     if (state.mode === 'loan') {
       lines.push('首付 ' + money(c.down) + '，贷款 ' + money(c.loan));
@@ -666,6 +719,13 @@
       var s = JSON.parse(localStorage.getItem(KEY_STATE) || 'null');
       if (s && typeof s === 'object') { for (var k in state) if (s[k] !== undefined) state[k] = s[k]; }
     } catch(e){}
+    // 旧版本把「置换」当购车方式，迁移成「置换补贴政策」
+    if (state.mode === 'trade') {
+      state.mode = 'cash';
+      state.policy = 'tradein';
+      if (!state.subsidy) state.subsidy = 8000;
+    }
+    if (!POLICIES[state.policy]) state.policy = 'first';
   }
 
   function renderPlans(){
@@ -686,8 +746,10 @@
 
   $('btnSave').addEventListener('click', function(){
     var c = calc(), list = loadPlans();
-    var modeText = state.mode === 'loan' ? '按揭' : (state.mode === 'trade' ? '置换' : '全款');
-    var sub = state.city + ' · ' + modeText + (state.mode === 'loan' ? ' · 首付' + state.downPct + '% / ' + state.term + '期' : '');
+    var pol = POLICIES[state.policy] || POLICIES.first;
+    var modeText = state.mode === 'loan' ? '按揭' : '全款';
+    var pctShown = (c.net > 0 ? c.down / c.net * 100 : 0).toFixed(1);
+    var sub = pol.label + ' · ' + modeText + (state.mode === 'loan' ? ' · 首付 ' + money(c.down) + '（' + pctShown + '%）/ ' + state.term + '期' : '');
     list.unshift({
       name: c.t.name,
       sub: sub,
@@ -704,9 +766,10 @@
   });
 
   $('btnReset').addEventListener('click', function(){
-    state.trim = CURATED; state.mode = 'cash'; state.city = '深圳';
-    state.disc = 4000; state.ins = 5000; state.fee = 500; state.subsidy = 0; state.trade = 0;
-    state.downPct = 30; state.term = 60; state.repay = 'rebate'; state.rate = 3.5;
+    state.trim = CURATED; state.mode = 'cash'; state.policy = 'first';
+    state.disc = 4000; state.shop = 0; state.ins = 5000; state.fee = 500; state.subsidy = 0; state.trade = 0;
+    state.downPct = 30; state.downManual = false; state.downAmt = 0;
+    state.term = 60; state.repay = 'rebate'; state.rate = 3.5;
     syncInputs(); render(); toast('已重置为默认配置');
   });
 
