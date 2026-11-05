@@ -141,6 +141,16 @@
   .iw input[readonly]:focus{border-color:var(--line-strong);box-shadow:none}
   .iw u{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:11.5px;text-decoration:none;pointer-events:none}
   .iw.has-unit input{padding-right:46px}
+  .iw.deal input{background:var(--green-soft);border-color:#c6e8d6;color:#0b6b3d;font-weight:700}
+  .iw.deal input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(15,157,88,.12)}
+  .iw.deal u{color:#5aa882}
+  .disc-split{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px}
+  .disc-split b{font-variant-numeric:tabular-nums}
+  .disc-chip{display:inline-flex;align-items:baseline;gap:4px;padding:2px 8px;border-radius:999px;background:var(--green-soft);color:#0b6b3d}
+  .disc-chip em{font-style:normal;font-size:11px;opacity:.72}
+  .disc-chip.zero{background:#f4f5f7;color:var(--faint)}
+  .disc-chip.zero em{opacity:.85}
+  .disc-plus{color:var(--faint);font-size:11px}
   .sub-note{font-size:11.5px;color:var(--faint);margin-top:5px}
   .lab-link{
     float:right;font-size:11px;color:var(--accent);cursor:pointer;font-weight:500;
@@ -450,8 +460,19 @@
             <div class="iw has-unit"><input id="guidePrice" min="0" step="0.01" type="number" value="15.99"><u>万元</u></div>
           </div>
           <div class="field">
-            <label>裸车成交价</label>
-            <div class="iw has-unit"><input id="dealPrice" min="0" step="0.01" type="number" value="15.59"><u>万元</u></div>
+            <label>厂家优惠<span class="lab-tip">厂商统一让利</span></label>
+            <div class="iw has-unit"><input id="factoryDisc" step="0.01" type="number" value="0.40"><u>万元</u></div>
+          </div>
+          <div class="field">
+            <label>店铺优惠<span class="lab-tip">经销商额外让利</span></label>
+            <div class="iw has-unit"><input id="dealerDisc" step="0.01" type="number" value="0.00"><u>万元</u></div>
+          </div>
+          <div class="field">
+            <label>裸车成交价<span class="lab-tip">自动合计</span></label>
+            <div class="iw has-unit deal"><input id="dealPrice" step="0.01" type="number" value="15.59"><u>万元</u></div>
+          </div>
+          <div class="field full">
+            <div class="sub-note" id="discNote">—</div>
           </div>
           <div class="field full">
             <label>原厂选配<span class="lab-tip">逐项填写，计入发票价，会抬升购置税与贷款基数</span></label>
@@ -473,9 +494,6 @@
           <div class="field">
             <label>补贴金额</label>
             <div class="iw has-unit"><input id="subsidy" min="0" readonly step="100" type="number" value="0"><u>元</u></div>
-          </div>
-          <div class="field full">
-            <div class="sub-note" id="discNote">—</div>
           </div>
           <div class="field full">
             <div class="sub-note" id="subsidyNote">—</div>
@@ -724,6 +742,7 @@
   <div class="foot">
     <b>购置税：</b>新能源乘用车在 2026.1.1–2027.12.31 期间<b>减半征收</b>，实征 5%（计税价格 = 裸车价 ÷ 1.13），每辆<b>减税上限 1.5 万元</b>，车价超过约 33.9 万后超出部分按 10% 正常缴纳。列入目录的新能源车同时免征车船税。<br>
     <b>置换补贴（安徽 2026）：</b>换购新能源乘用车按新车销售价格（发票价税合计）的 <b>8%</b> 补贴，<b>上限 1.5 万元</b>；报废更新为 12%、上限 2 万元。两者只能选一种，政策期内每位消费者限享一次，补贴在审核后返还，提车时仍需先全额垫付。因此结果区给出两个口径：<b>实付落地价</b>（提车时按票面全额支付）与<b>补贴到账后净支出</b>（最终真正花掉的钱），差额即为补贴。<br>
+    <b>优惠拆分：</b>裸车成交价 = 厂商指导价 − <b>厂家优惠</b>（厂商统一降价、限时权益等官方让利）− <b>店铺优惠</b>（经销商额外让利、清库让利等门店让利）。两项都直接冲减发票价，因此会同步降低购置税、置换补贴基数与贷款金额。谈价时分开记录，才能看清让利到底来自厂家政策还是门店。<br>
     <b>原厂选配：</b>与整车开在同一张发票上的选装配置（智驾包、座椅包、轮毂、车漆等）计入发票价，因此<b>同步抬升购置税、贷款基数与置换补贴基数</b>。后市场的装饰 / 加装、充电桩安装单列在落地费用里，不计购置税。<br>
     <b>返息方案（5 年返息，前 2 年 0 息）：</b>5 年期贷款（60 期），前 24 期只还本金、不计利息，第 25–60 期剩余本金按「第 3–5 年利率」摊还。贴息一般由厂商或经销商承担，常见形式为利息先付后返、或直接冲抵车价，需以合同条款为准。真实年化按整段现金流算，因此会低于第 3–5 年名义利率——这正是贴息带来的收益。<br>
     <b>真实年化利率：</b>按现金流 IRR 计算，期初实际到手 = 贷款额 − 金融服务费 − 强制装潢，逐期月供折现求月内部收益率再 ×12 折算（APR 口径），可直接与银行报的名义利率对比。续保押金可退，不计入成本。<br>
@@ -919,9 +938,19 @@ function computeCore(i){
     return null;
   }
 
+  // 裸车成交价 = 厂商指导价 − 厂家优惠 − 店铺优惠（三项互算，始终自洽）
+  function syncDeal(){
+    var g = num('guidePrice'), f = num('factoryDisc'), d = num('dealerDisc');
+    $('dealPrice').value = (g - f - d).toFixed(2);
+  }
+
   function read(){
     var type = $('subsidyType').value;
-    var deal = num('dealPrice') * 10000;
+    var guide = num('guidePrice') * 10000;
+    var facDisc = num('factoryDisc') * 10000;   // 厂商统一让利
+    var dlrDisc = num('dealerDisc') * 10000;    // 经销商额外让利
+    var dealRaw = guide - facDisc - dlrDisc;
+    var deal = Math.max(0, dealRaw);
     var optTotal = readOptTotal();
     var carTotal = deal + optTotal;
     // 补贴按新车销售价格（发票价税合计）计，选配同票则一并计入
@@ -942,10 +971,14 @@ function computeCore(i){
     return {
       energy: radio('energy'),
       deal: deal,
+      dealNeg: dealRaw < 0,
+      facDisc: facDisc,
+      dlrDisc: dlrDisc,
+      discTotal: facDisc + dlrDisc,
       optTotal: optTotal,
       optList: readOptRows(),
       carTotal: carTotal,
-      guide: num('guidePrice') * 10000,
+      guide: guide,
       subsidy: num('subsidy'),
       subsidyType: type,
       subsidyAuto: auto,
@@ -1008,16 +1041,25 @@ function computeCore(i){
       if (inp) chips[ci].classList.toggle('is-on', inp.checked);
     }
 
-    // 优惠提示
+    // 优惠拆分：厂家优惠 / 店铺优惠 始终并列展示，合计对比指导价
     // 优惠只比裸车成交价：选配是额外加购，不参与砍价
-    var off = i.guide - i.deal;
-    var optSuffix = i.optTotal > 0 ? '；选配 ' + money(i.optTotal) + ' 另计入发票价' : '';
-    if (off > 0) {
-      $('discNote').innerHTML = '较指导价优惠 <b style="color:var(--green)">' + (off/10000).toFixed(2) + ' 万元</b>（' + (off/i.guide*100).toFixed(1) + '%）' + optSuffix;
-    } else if (off < 0) {
-      $('discNote').innerHTML = '裸车成交价高于指导价 <b style="color:var(--red)">' + (-off/10000).toFixed(2) + ' 万元</b>（加价）' + optSuffix;
+    var optSuffix = i.optTotal > 0 ? '选配 ' + money(i.optTotal) + ' 另计入发票价' : '';
+    var discs = i.facDisc + i.dlrDisc;
+    var discChip = function(lb, v){
+      return '<span class="disc-chip' + (v === 0 ? ' zero' : '') + '"><em>' + lb + '</em><b>' + (v / 10000).toFixed(2) + ' 万</b></span>';
+    };
+    if (i.dealNeg) {
+      $('discNote').innerHTML = '两项优惠合计已超过指导价，请检查金额' + (optSuffix ? '；' + optSuffix : '');
+    } else if (discs < 0) {
+      $('discNote').innerHTML = '裸车成交价高于指导价 <b style="color:var(--red)">' + (-discs/10000).toFixed(2) + ' 万元</b>（加价）' + (optSuffix ? '；' + optSuffix : '');
     } else {
-      $('discNote').textContent = '按指导价成交，无优惠' + optSuffix;
+      var tail = discs > 0
+        ? '<span class="disc-plus">＝</span><b style="color:var(--green)">' + (discs/10000).toFixed(2) + ' 万</b>' +
+          (i.guide > 0 ? '<span style="color:var(--faint)">（较指导价低 ' + (discs/i.guide*100).toFixed(1) + '%）</span>' : '')
+        : '<span style="color:var(--faint)">（按指导价成交，无优惠）</span>';
+      $('discNote').innerHTML = '<span class="disc-split">' +
+        discChip('厂家优惠', i.facDisc) + '<span class="disc-plus">＋</span>' + discChip('店铺优惠', i.dlrDisc) + tail +
+        (optSuffix ? '<span style="color:var(--faint)">· ' + optSuffix + '</span>' : '') + '</span>';
     }
 
     // 选配合计
@@ -1037,9 +1079,14 @@ function computeCore(i){
     $('rLandHint').textContent = r.capped ? '购置税减免已封顶 1.5 万' : '购置税实征 5%';
     $('rLandHint').style.color = r.capped ? 'var(--amber)' : '';
 
-    var rows = [
-      ['裸车成交价', i.deal]
-    ];
+    var rows = [];
+    // 指导价与两项优惠先列出，再落到裸车成交价，让优惠去向一目了然
+    if (i.facDisc !== 0 || i.dlrDisc !== 0) {
+      rows.push(['厂商指导价', i.guide]);
+      rows.push(['厂家优惠', -i.facDisc]);
+      rows.push(['店铺优惠', -i.dlrDisc]);
+    }
+    rows.push(['裸车成交价', i.deal]);
     if (i.optTotal > 0) rows.push(['原厂选配', i.optTotal]);
     rows.push(['车辆购置税', r.purchaseTax]);
     rows.push(['交强险', i.compulsory]);
@@ -1250,6 +1297,14 @@ function computeCore(i){
       // 首付：记住用户最后动的是比例还是金额，再重算
       if (e.target.id === 'downPct') downSrc = 'pct';
       if (e.target.id === 'downAmt') downSrc = 'amt';
+      // 车价三项联动：改指导价 / 优惠 → 重算成交价；直接改成交价 → 差额归到店铺优惠
+      if (e.target.id === 'dealPrice') {
+        if (e.target.value === '' || isNaN(parseFloat(e.target.value))) return;  // 清空重输时不打断
+        var rest = num('guidePrice') - num('factoryDisc') - num('dealPrice');
+        $('dealerDisc').value = (Math.round(rest * 100) / 100).toFixed(2);
+      } else if (e.target.id === 'guidePrice' || e.target.id === 'factoryDisc' || e.target.id === 'dealerDisc') {
+        syncDeal();
+      }
       render();
     }
   });
@@ -1307,6 +1362,8 @@ function computeCore(i){
       var open = !!openSet[p.id];
       var hasSub = (p.subsidy || 0) > 0;
       var grid = '';
+      if (p.facDisc) grid += cell('厂家优惠', '−' + money(p.facDisc), 'g');
+      if (p.dlrDisc) grid += cell('店铺优惠', '−' + money(p.dlrDisc), 'g');
       grid += cell('裸车成交价', p.deal ? money(p.deal) : '—');
       grid += cell('原厂选配', p.optTotal > 0 ? '+' + money(p.optTotal) : '—', p.optTotal > 0 ? '' : 'dim');
       grid += cell(hasSub ? '政府补贴（后返）' : '政府补贴',
@@ -1414,6 +1471,7 @@ function computeCore(i){
       name: $('carName').value || '未命名车型',
       short: (i.energy === 'ev' ? '纯电' : '插混') + ' / ' + (i.carTotal/10000).toFixed(2) + '万 / 首付' + Math.round(i.downPct*100) + '% / ' + i.term + '期'
            + (i.repay === 'rebate' ? ' / 返息' : ''),
+      guide: i.guide, facDisc: i.facDisc, dlrDisc: i.dlrDisc,
       deal: i.deal, optTotal: i.optTotal, opts: i.optList, down: last.down, downPct: i.downPct,
       term: i.term, rate: i.rate, rate3: i.rate3, repay: i.repay,
       benchRate: i.repay === 'rebate' ? i.rate3 : i.rate,
@@ -1564,9 +1622,11 @@ function computeCore(i){
       '<span>' + t.power + '</span>' +
       '<span>0-100km/h ' + t.accel + '</span>' +
       '<span>' + (t.energy === 'ev' ? '800V 平台' : '增程 1.5L') + '</span>';
-    // 联动到计算器输入：指导价 / 裸车成交价（限时权益价约低 0.4 万）/ 动力类型 / 车型名
+    // 联动到计算器输入：指导价 / 厂家优惠（厂商限时权益约 0.4 万）/ 店铺优惠（到店另谈）/ 动力类型 / 车型名
     $('guidePrice').value = t.guide.toFixed(2);
-    $('dealPrice').value = (t.guide - 0.4).toFixed(2);
+    $('factoryDisc').value = '0.40';
+    $('dealerDisc').value = '0.00';
+    syncDeal();
     var en = (t.energy === 'ev') ? 'ev' : 'phev';
     var radioEl = document.querySelector('input[name="energy"][value="' + en + '"]');
     if (radioEl) radioEl.checked = true;
